@@ -9,35 +9,66 @@ const Schema = mongoose.Schema;
 // TODO: Add other fields: lastname, firstname, birthday, etc.
 const userSchema = new Schema({
     // Additional validation, it's also done serverside!
-    email: {
+    methode: {
         type: String,
-        required: true,
-        unique: true,
-        lowercase: true
-    },
-    password: {
-        type: String,
+        enum: ['local', 'google', 'facebook'],
         required: true
-    }
+    },
+    local: {
+        email: {
+            type: String,
+            lowercase: true
+        },
+        password: {
+            type: String
+        }
+    },
+    google: {
+        id: {
+            type: String
+        },
+        email: {
+            type: String,
+            lowercase: true
+        }
+    },
+    facebook: {
+        id: {
+            type: String
+        },
+        email: {
+            type: String,
+            lowercase: true
+        }
+    },
+
+
 });
 
-userSchema.pre('save', async function(next){
-try {
-        //Generate a salt
+// Before the new use is saved in the database
+userSchema.pre('save', async function (next) {
+//console.log('this.logal.password', this.local.password);
+    try {
+        if(this.methode !== 'local'){
+            next();
+        }
+
+        // generate a salt
         const salt = await bcrypt.genSalt(10);
-        // Generate  password has (salt +hash)
-        const passowrdHas = await bcrypt.hash(this.password,salt) //userpassowrd, salt => contains hash and hashedPassword, with that hash can the entered password while login be comapred
-        // Assign hashed Password
-        this.password = passowrdHas;
+        // generate  password has (salt +hash)
+        const passowrdHas = await bcrypt.hash(this.local.password, salt) //userpassoword, salt => contains hash and hashedPassword, with that hash can the entered password while login be comapred
+        // assign hashed Password
+        this.local.password = passowrdHas;
         next();
     } catch (error) {
         next(error);
     }
 }); // before user gets saved this is executed, ES6 arrow functions don't work when referencing out of this object
 
-userSchema.methods.isValidPassword = async function(passwordToCheck) {
+// before logged in we need to check whether or not the password is correct
+userSchema.methods.isValidPassword = async function (passwordToCheck) {
     try {
-        return await bcrypt.compare(passwordToCheck, this.password);
+        return await bcrypt.compare(passwordToCheck, this.local.password);
 
     } catch (error) {
         throw new Error(error);
