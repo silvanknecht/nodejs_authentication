@@ -20,12 +20,17 @@ const passportGoogle = passport.authenticate('googleToken', {
 const passportFacebook = passport.authenticate('facebookToken', {
     session: false
 });
+const passportGithub = passport.authenticate('githubToken', {
+    session: false
+});
+
 
 // if the validation fails the controller doesn't get called
 router.post('/signup', validateBody(schemas.authSchema), UsersController.signUp);
 router.post('/signin', validateBody(schemas.authSchema), passportSignIn, UsersController.signIn);
 router.post('/oauth/google', passportGoogle, UsersController.googleOAuth);
 router.post('/oauth/facebook', passportFacebook, UsersController.facebookOAuth);
+router.post('/oauth/github', passportGithub, UsersController.githubOAuth);
 router.get('/secret', passportJWT, UsersController.secret);
 
 

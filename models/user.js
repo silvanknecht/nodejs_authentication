@@ -11,7 +11,7 @@ const userSchema = new Schema({
     // Additional validation, it's also done serverside!
     methode: {
         type: String,
-        enum: ['local', 'google', 'facebook'],
+        enum: ['local', 'google', 'facebook', 'github'],
         required: true
     },
     local: {
@@ -41,6 +41,15 @@ const userSchema = new Schema({
             lowercase: true
         }
     },
+    github: {
+        id: {
+            type: String
+        },
+        email: {
+            type: String,
+            lowercase: true
+        }
+    }
 
 
 });

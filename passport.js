@@ -6,6 +6,7 @@ const {
 const LocalStrategy = require('passport-local').Strategy;
 const GooglePLusTokenStrategy = require('passport-google-plus-token');
 const FacebookTokenStrategy = require('passport-facebook-token');
+const GithubTokenStrategy = require('passport-github-token');
 const config = require('./conf');
 const User = require('./models/user');
 
@@ -100,6 +101,40 @@ done(null, newUser);
    done(error,false, error.message);
 }
 }));
+
+// Github OAUTH STRATEGY
+passport.use('githubToken', new GithubTokenStrategy({
+   clientID: config.oauth.github.clientID,
+   clientSecret: config.oauth.github.clientSecret
+}, async(accessToken, refreshToken,profile,done)=>{
+try {
+   console.log("profile", profile);
+   console.log("accessToken", accessToken);
+   console.log("refreshToken", refreshToken);
+
+   // check whether current user exits in DB
+const exitingUser = await User.findOne({
+   "github.id": profile.id
+});
+if(exitingUser){
+   return done(null, existingUser);
+}
+const newUser = new User({
+   methode: 'github',
+   facebook: {
+      id: profile.id,
+      email: profile.emails[0].value
+   }
+});
+
+await newUser.save();
+done(null, newUser);
+
+} catch (error) {
+   done(error,false, error.message);
+}
+}));
+
 
 
 // LOCAL STRATEGY

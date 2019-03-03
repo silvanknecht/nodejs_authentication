@@ -88,6 +88,16 @@ module.exports = {
         });
     },
 
+
+    githubOAuth: async function(req, res, next) {
+        // generate token
+        console.log(`Successful githubOAuth!`);
+        const token = signToken(req.user);
+        res.status(200).json({
+            token
+        });
+    },
+
     secret: async function (req, res, next) {
         console.log('I got the secret');
         res.json({
