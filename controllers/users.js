@@ -59,8 +59,7 @@ module.exports = {
 
 
     signIn: async function (req, res, next) {
-        // req.user gives access to the user object
-        console.log(`Successful login!`);
+        console.log(`Successful signIn!`);
         // generate token
         const token = signToken(req.user);
         res.status(200).json({
@@ -69,9 +68,20 @@ module.exports = {
 
     },
 
+    // TODO: bring googleOAUTH and facebookOAuth together since they are the same function
+
     googleOAuth: async function(req, res, next) {
         // generate token
-        console.log('req.user', req.user);
+        console.log(`Successful googleOAuth!`);
+        const token = signToken(req.user);
+        res.status(200).json({
+            token
+        });
+    },
+
+    facebookOAuth: async function(req, res, next) {
+        // generate token
+        console.log(`Successful facebookOAuth!`);
         const token = signToken(req.user);
         res.status(200).json({
             token
