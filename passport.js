@@ -6,7 +6,7 @@ const {
 const LocalStrategy = require('passport-local').Strategy;
 const GooglePLusTokenStrategy = require('passport-google-plus-token');
 const FacebookTokenStrategy = require('passport-facebook-token');
-const config = require('./configuration');
+const config = require('./conf');
 const User = require('./models/user');
 
 // JSON WEB TOKEN STRATEGY
@@ -41,6 +41,7 @@ passport.use('googleToken', new GooglePLusTokenStrategy({
       console.log("profile", profile);
 
       // check whether current user exists in DB
+      // TODO: maybe only let the user create one account with every E-Mail address!
       const existingUser = await User.findOne({
          "google.id": profile.id
       });

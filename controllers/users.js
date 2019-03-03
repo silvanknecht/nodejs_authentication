@@ -2,7 +2,7 @@ const JWT = require('jsonwebtoken');
 const User = require('../models/user');
 const {
     JWT_SECRET
-} = require('../configuration'); // the index file gets fetched automatically as the first option!
+} = require('../conf'); // the index file gets fetched automatically as the first option!
 
 signToken = user => {
     // create token
