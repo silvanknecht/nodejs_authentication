@@ -9,6 +9,8 @@ const FacebookTokenStrategy = require('passport-facebook-token');
 const GithubTokenStrategy = require('passport-github-token');
 const config = require('./conf');
 const User = require('./models/user');
+//TODO: check if email is empty during registration!!!
+
 
 // JSON WEB TOKEN STRATEGY
 passport.use(new JwtStrategy({
@@ -80,10 +82,10 @@ try {
    console.log("refreshToken", refreshToken);
 
    // check whether current user exits in DB
-const exitingUser = await User.findOne({
+const existingUser = await User.findOne({
    "facebook.id": profile.id
 });
-if(exitingUser){
+if(existingUser){
    return done(null, existingUser);
 }
 const newUser = new User({
@@ -113,15 +115,15 @@ try {
    console.log("refreshToken", refreshToken);
 
    // check whether current user exits in DB
-const exitingUser = await User.findOne({
+const existingUser = await User.findOne({
    "github.id": profile.id
 });
-if(exitingUser){
+if(existingUser){
    return done(null, existingUser);
 }
 const newUser = new User({
    methode: 'github',
-   facebook: {
+   github: {
       id: profile.id,
       email: profile.emails[0].value
    }

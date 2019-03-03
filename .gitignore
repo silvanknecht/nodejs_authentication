@@ -61,4 +61,8 @@ typings/
 .next
 
 # Don't Push sensitive information
-conf/index.js
+server/conf/index.js
+
+#client
+client/node_modules
+
