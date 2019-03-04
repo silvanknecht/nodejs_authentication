@@ -18,15 +18,15 @@ passport.use(new JwtStrategy({
    secretOrKey: config.JWT_SECRET
 }, async (payload, done) => {
    try {
-      // Find the user specified in token
+      // find the user specified in token
       console.log(payload);
       const user = await User.findById(payload.sub);
 
-      // If user doesn't exist
+      // if user doesn't exist
       if (!user) {
          return done(null, false);
       }
-      // Otherwise, return the user
+      // otherwise, return the user
       done(null, user);
    } catch (error) {
       done(error, false);
@@ -75,66 +75,66 @@ passport.use('googleToken', new GooglePLusTokenStrategy({
 passport.use('facebookToken', new FacebookTokenStrategy({
    clientID: config.oauth.facebook.clientID,
    clientSecret: config.oauth.facebook.clientSecret
-}, async(accessToken, refreshToken,profile,done)=>{
-try {
-   console.log("profile", profile);
-   console.log("accessToken", accessToken);
-   console.log("refreshToken", refreshToken);
+}, async (accessToken, refreshToken, profile, done) => {
+   try {
+      console.log("profile", profile);
+      console.log("accessToken", accessToken);
+      console.log("refreshToken", refreshToken);
 
-   // check whether current user exits in DB
-const existingUser = await User.findOne({
-   "facebook.id": profile.id
-});
-if(existingUser){
-   return done(null, existingUser);
-}
-const newUser = new User({
-   methode: 'facebook',
-   facebook: {
-      id: profile.id,
-      email: profile.emails[0].value
+      // check whether current user exits in DB
+      const existingUser = await User.findOne({
+         "facebook.id": profile.id
+      });
+      if (existingUser) {
+         return done(null, existingUser);
+      }
+      const newUser = new User({
+         methode: 'facebook',
+         facebook: {
+            id: profile.id,
+            email: profile.emails[0].value
+         }
+      });
+
+      await newUser.save();
+      done(null, newUser);
+
+   } catch (error) {
+      done(error, false, error.message);
    }
-});
-
-await newUser.save();
-done(null, newUser);
-
-} catch (error) {
-   done(error,false, error.message);
-}
 }));
 
 // Github OAUTH STRATEGY
 passport.use('githubToken', new GithubTokenStrategy({
    clientID: config.oauth.github.clientID,
    clientSecret: config.oauth.github.clientSecret
-}, async(accessToken, refreshToken,profile,done)=>{
-try {
-   console.log("profile", profile);
-   console.log("accessToken", accessToken);
-   console.log("refreshToken", refreshToken);
+}, async (accessToken, refreshToken, profile, done) => {
+   try {
+      console.log("profile", profile);
+      console.log("accessToken", accessToken);
+      console.log("refreshToken", refreshToken);
 
-   // check whether current user exits in DB
-const existingUser = await User.findOne({
-   "github.id": profile.id
-});
-if(existingUser){
-   return done(null, existingUser);
-}
-const newUser = new User({
-   methode: 'github',
-   github: {
-      id: profile.id,
-      email: profile.emails[0].value
+      // check whether current user exits in DB
+      const existingUser = await User.findOne({
+         "github.id": profile.id
+      });
+      if (existingUser) {
+         return done(null, existingUser);
+      }
+      const newUser = new User({
+         methode: 'github',
+         github: {
+            id: profile.id,
+            email: profile.emails[0].value
+         }
+      });
+
+      await newUser.save();
+      done(null, newUser);
+
+   } catch (error) {
+      done(error, false, error.message);
    }
-});
-
-await newUser.save();
-done(null, newUser);
-
-} catch (error) {
-   done(error,false, error.message);
-}
 }));
 
 
