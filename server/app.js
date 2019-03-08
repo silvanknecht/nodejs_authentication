@@ -15,6 +15,8 @@ app.use(express.json());
 
 // Routes
 app.use('/users', require('./routes/users'));
+app.use('/tasks', require('./routes/tasks'));
+
 
 // Start the server
 const port = process.env.PORT || 5000;

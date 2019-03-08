@@ -26,6 +26,9 @@ module.exports = {
         }),
         oAuthSchema: Joi.object().keys({
             id: Joi.string().required()
+        }),
+        taskSchema: Joi.object().keys({
+            description: Joi.string().required()
         })
 
     }
