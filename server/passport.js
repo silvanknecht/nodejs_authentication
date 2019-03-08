@@ -9,8 +9,12 @@ const FacebookTokenStrategy = require('passport-facebook-token');
 const GithubTokenStrategy = require('passport-github-token');
 const config = require('./conf');
 const User = require('./models/user');
-//TODO: check if email is empty during registration!!!
+const Joi = require('joi');
 
+const {
+   validateBody,
+   schemas
+} = require('./helpers/routeHelpers');
 
 // JSON WEB TOKEN STRATEGY
 passport.use(new JwtStrategy({
@@ -42,6 +46,14 @@ passport.use('googleToken', new GooglePLusTokenStrategy({
       console.log("accessToken", accessToken);
       console.log("refreshToken", refreshToken);
       console.log("profile", profile);
+      console.log("profile ID", typeof profile.id);
+
+      // check if the userId is valid
+      const result = Joi.validate({id:profile.id}, schemas.oAuthSchema);
+      if(result.error){
+         console.log(result.error);
+         done(null, false, result.error);
+      }
 
       // check whether current user exists in DB
       // TODO: maybe only let the user create one account with every E-Mail address!
@@ -80,6 +92,12 @@ passport.use('facebookToken', new FacebookTokenStrategy({
       console.log("profile", profile);
       console.log("accessToken", accessToken);
       console.log("refreshToken", refreshToken);
+        // check if the userId is valid
+        const result = Joi.validate({id:profile.id}, schemas.oAuthSchema);
+        if(result.error){
+           console.log(result.error);
+           done(null, false, result.error);
+        }
 
       // check whether current user exits in DB
       const existingUser = await User.findOne({
@@ -113,6 +131,12 @@ passport.use('githubToken', new GithubTokenStrategy({
       console.log("profile", profile);
       console.log("accessToken", accessToken);
       console.log("refreshToken", refreshToken);
+        // check if the userId is valid
+        const result = Joi.validate({id:profile.id}, schemas.oAuthSchema);
+        if(result.error){
+           console.log(result.error);
+           done(null, false, result.error);
+        }
 
       // check whether current user exits in DB
       const existingUser = await User.findOne({
