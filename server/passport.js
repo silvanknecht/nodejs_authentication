@@ -164,7 +164,7 @@ passport.use('githubToken', new GithubTokenStrategy({
 
 
 // LOCAL STRATEGY
-passport.use(new LocalStrategy({
+passport.use('local', new LocalStrategy({
    usernameField: 'email',
 }, async (email, password, done) => {
    try {
