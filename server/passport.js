@@ -18,7 +18,7 @@ const {
 
 // JSON WEB TOKEN STRATEGY
 passport.use(new JwtStrategy({
-   jwtFromRequest: ExtractJwt.fromHeader('authorization'),
+   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken('authorization'),
    secretOrKey: config.JWT_SECRET
 }, async (payload, done) => {
    try {
