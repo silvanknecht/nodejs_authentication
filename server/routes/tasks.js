@@ -16,7 +16,8 @@ const passportJWT = passport.authenticate('jwt', {
 
 // create, edit, delete, update, tasks
 router.post('/create',validateBody(schemas.taskSchema),passportJWT ,TaskController.create);
-
+router.put('/update/:id',validateBody(schemas.taskSchema),passportJWT ,TaskController.update);
+router.delete('/delete/:id',passportJWT ,TaskController.delete);
 
 
 module.exports = router;
