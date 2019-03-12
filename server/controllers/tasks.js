@@ -2,6 +2,25 @@ const Task = require('../models/task');
 
 
 module.exports = {
+    getAll: async function (req, res, next) {
+        const {
+            id
+        } = req.user;
+        const allTasks = await Task.find({
+            "creatorID": id
+        }).catch(err => {
+            return res.status(404).json({
+                "success": false
+            });
+        })
+
+        // responde with an array of all taks which belonge to the user asking for it
+        return res.status(200).json({
+            "success": true,
+            allTasks
+        })
+
+    },
 
     create: async function (req, res, next) {
         const {
@@ -15,7 +34,7 @@ module.exports = {
             creatorID: id,
             description: description
 
-        }); //ES6 same as email:email, password: password
+        });
         await newTask.save();
 
         // respond with the newly created task
