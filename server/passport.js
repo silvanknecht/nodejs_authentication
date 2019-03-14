@@ -63,7 +63,7 @@ passport.use('googleToken', new GooglePLusTokenStrategy({
          "google.id": profile.id
       });
       if (existingUser) {
-         console.log("User already exists!")
+         console.log("User already exists!");
          return done(null, existingUser);
       }
       console.log("User doesn't exitst --> creating a new one!");
@@ -200,4 +200,4 @@ passport.use('local', new LocalStrategy({
       done(error, false); // send back the error and no user object!
    }
 
-}))
+}));
