@@ -9,7 +9,7 @@ const {
     schemas
 } = require('../helpers/routeHelpers');
 
-// route protection   
+// route protection
 const passportJWT = passport.authenticate('jwt', {
     session: false
 });
@@ -17,9 +17,9 @@ const passportJWT = passport.authenticate('jwt', {
 const { isOwner } = require('../controllers/tasks');
 
 // create, edit, delete, update, tasks
-router.post('/create',validateBody(schemas.taskSchema),passportJWT,TaskController.create);
-router.put('/update/:id',validateBody(schemas.taskSchema),passportJWT,isOwner,TaskController.update);
-router.delete('/delete/:id',passportJWT,isOwner,TaskController.delete);
+router.post('/',validateBody(schemas.taskSchema),passportJWT,TaskController.create);
+router.put('/:id',validateBody(schemas.taskSchema),passportJWT,isOwner,TaskController.update);
+router.delete('/:id',passportJWT,isOwner,TaskController.delete);
 router.get('/',passportJWT,TaskController.getAll);
 
 
