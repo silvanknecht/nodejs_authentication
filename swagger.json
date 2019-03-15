@@ -1,0 +1,44 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Node_Authentication",
+    "description": "An API which allows you to loggin locally or using oAuth -> Google, Facebook and Github"
+  },
+  "schemes": [
+    "https"
+  ],
+  "host": "localhost:5000",
+  "paths": {
+    "/users": {
+      "get": {
+        "summary": "Gets some persons",
+        "description": "Returns a list containing all persons.",
+        "responses": {
+          "200": {
+            "description": "A list of Person",
+            "schema": {
+              "type": "array",
+              "items": {
+                "required": [
+                  "username"
+                ],
+                "properties": {
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  },
+                  "username": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
