@@ -16,9 +16,11 @@ const app = express();
 app.use(morgan('dev'));
 app.use(express.json());
 
+
 // routes
 // users
 app.use('/api/v1/users', require('./routes/users'));
+
 
 // start the server
 const port = process.env.PORT || 5000;
