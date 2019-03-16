@@ -49,10 +49,12 @@ passport.use('googleToken', new GooglePLusTokenStrategy({
       console.log("profile ID", typeof profile.id);
 
       // check if the userId is valid
-      const result = Joi.validate({id:profile.id}, schemas.oAuthSchema);
-      if(result.error){
+      const result = Joi.validate({
+         id: profile.id
+      }, schemas.oAuthSchema);
+      if (result.error) {
          console.log(result.error);
-         done(null, false, result.error);
+         return done(null, false, result.error);
       }
 
       // check whether current user exists in DB
@@ -92,12 +94,14 @@ passport.use('facebookToken', new FacebookTokenStrategy({
       console.log("profile", profile);
       console.log("accessToken", accessToken);
       console.log("refreshToken", refreshToken);
-        // check if the userId is valid
-        const result = Joi.validate({id:profile.id}, schemas.oAuthSchema);
-        if(result.error){
-           console.log(result.error);
-           done(null, false, result.error);
-        }
+      // check if the userId is valid
+      const result = Joi.validate({
+         id: profile.id
+      }, schemas.oAuthSchema);
+      if (result.error) {
+         console.log(result.error);
+         return done(null, false, result.error);
+      }
 
       // check whether current user exits in DB
       const existingUser = await User.findOne({
@@ -131,16 +135,23 @@ passport.use('githubToken', new GithubTokenStrategy({
       console.log("profile", profile);
       console.log("accessToken", accessToken);
       console.log("refreshToken", refreshToken);
-        // check if the userId is valid
-        const result = Joi.validate({id:profile.id}, schemas.oAuthSchema);
-        if(result.error){
-           console.log(result.error);
-           done(null, false, result.error);
-        }
+
+      let profileID = profile.id;
+      let profileIDString = profileID.toString();
+      // check if the userId is valid
+      const result = Joi.validate({
+         id: profileIDString
+      }, schemas.oAuthSchema);
+      if (result.error) {
+         console.log(result.error);
+         return done(null, false, result.error);
+      }
+
+
 
       // check whether current user exits in DB
       const existingUser = await User.findOne({
-         "github.id": profile.id
+         "github.id": profileIDString
       });
       if (existingUser) {
          return done(null, existingUser);
@@ -148,7 +159,7 @@ passport.use('githubToken', new GithubTokenStrategy({
       const newUser = new User({
          methode: 'github',
          github: {
-            id: profile.id,
+            id: profileIDString,
             email: profile.emails[0].value
          }
       });
