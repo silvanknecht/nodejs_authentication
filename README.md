@@ -62,7 +62,9 @@ if (process.env.NODE_ENV === 'test') {
   };
 }
 ```
+## Documentation
 
+You can find a postman collection in the respository or online --> [Collection](https://documenter.getpostman.com/view/6959951/S17nUqF1#53f482c6-224d-4a09-b2cf-676736c98ebd)
 
 ## Built With
 
