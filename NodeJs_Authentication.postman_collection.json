@@ -1,0 +1,206 @@
+{
+	"info": {
+		"_postman_id": "52e0fa4e-3d2a-4b52-a124-0013f966f184",
+		"name": "NodeJs_Authentication",
+		"description": "# Introduction\nAn Authorisation API that includes local authentication and oAuth with google, facebook and github.\n\n# Overview\nDon't forget to create the config file according to the readme\n\n# Authentication\nThis is an Authentication API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://localhost:5000/api/v1/users/signup",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"silvanksnecht@test2.ch\",\n\t\"password\": \"dafsdfasdfasd\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/v1/users/signup",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"signup"
+					]
+				},
+				"description": "Register a new user and save it in MongoDB"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:5000/api/v1/users/signin",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"testemail@gmail.com\",\n\t\"password\": \"test\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5000/users/signIn",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"users",
+						"signIn"
+					]
+				},
+				"description": "Log in with an existing user previousely registered"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:5000/api/v1/users/oauth/google",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"access_token\": \"ya29.GlvDBrKJz97zHaESWP4_6ZYPnPvUEv-ipV1mwdkIIp7JIcEZXnNBqCRpxgReq0VI7TbrviDf-fd0JE8usK-xHQWW9q3lr8eDqb2q7Izd0DIQg2QqJKHCjpFCBhlO\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5000/users/oauth/google",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"users",
+						"oauth",
+						"google"
+					]
+				},
+				"description": "adding a new user with google authentication, returns a json web token, requires public access_token by google"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:5000/api/v1/users/oauth/facebook",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"access_token\": \"EAAFFWkHjGa8BAO8ZA8718ktywQab9QbIGfEtZBu2IWlhZAx271OunZBMyluNwlC3ZAW4acjT8DMdMNhnQGRDQaHQhtYiTapZBkqM6Ius1vnf8BbUy2F9FUTGVPJYl2gZAWo8cRVxPVetV2OyYmI0ZCSrPW4ALNP535SZBthmnRTxMgvA03bpz2MFv7FW0ZAwAuT6cJLDpghztd8wZDZD\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5000/users/oauth/facebook",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"users",
+						"oauth",
+						"facebook"
+					]
+				},
+				"description": "adding a new user with facebook authentication, returns a json web token, requires public access_token by facebook"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:5000/api/v1/users/oauth/github",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"access_token\": \"6d34adc8d43c97d965fa205d562e150d0f1bb72d\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5000/users/oauth/github",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"users",
+						"oauth",
+						"github"
+					]
+				},
+				"description": "adding a new user with github authentication, returns a json web token, requires public access_token by github"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:5000/api/v1/users/secret",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJTaWx2YW5LbmVjaHQiLCJzdWIiOiI1YzdjNTllMjEyZmE0NDBmNzg3ZTY1ZDkiLCJpYXQiOjE1NTE2NTMzNDYyNTQsImV4cCI6MTU1MTczOTc0NjI1NH0.ChpwfXs-ooIQ5-Y9JNsqPrGk0h0WJixNgYrMHZ4J7QM",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:5000/users/secret",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"users",
+						"secret"
+					]
+				},
+				"description": "Access protected source"
+			},
+			"response": []
+		}
+	]
+}
