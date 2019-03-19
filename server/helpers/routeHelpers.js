@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const debugRouteHelpers = require('debug')('auth:routeHelpers');
 
 module.exports = {
     // function to validate ...
@@ -6,6 +7,7 @@ module.exports = {
         return (req, res, next) => {
             const result = Joi.validate(req.body, schema);
             if (result.error) {
+                debugRouteHelpers('body validation failed');
                 return res.status(400).json(result.error);
             }
 

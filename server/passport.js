@@ -11,6 +11,13 @@ const config = require('./conf');
 const User = require('./models/user');
 const Joi = require('joi');
 
+// debug
+const debugPassportJWT = require('debug')('auth:passportJWT');
+const debugPassportGooglePLus = require('debug')('auth:passportGooglePLus');
+const debugPassportFacebook = require('debug')('auth:passportFacebook');
+const debugPassportGithub = require('debug')('auth:passportGithub');
+const debugPassportLocal = require('debug')('auth:passportLocal');
+
 const {
    validateBody,
    schemas
@@ -23,16 +30,18 @@ passport.use(new JwtStrategy({
 }, async (payload, done) => {
    try {
       // find the user specified in token
-      console.log("Payload JWTStrategy", payload);
+      debugPassportJWT('payload', payload);
       const user = await User.findById(payload.sub);
 
       // if user doesn't exist
       if (!user) {
+         debugPassportJWT(`User doesn't exit`);
          return done(null, false);
       }
       // otherwise, return the user
       done(null, user);
    } catch (error) {
+      debugPassportJWT(`JWT authentication failed`, error);
       done(error, false);
    }
 }));
@@ -43,17 +52,16 @@ passport.use('googleToken', new GooglePLusTokenStrategy({
    clientSecret: config.oauth.google.clientSecret
 }, async (accessToken, refreshToken, profile, done) => {
    try {
-      console.log("accessToken", accessToken);
-      console.log("refreshToken", refreshToken);
-      console.log("profile", profile);
-      console.log("profile ID", typeof profile.id);
+      debugPassportGooglePLus('accessToken', accessToken);
+      debugPassportGooglePLus('refreshToken', refreshToken);
+      debugPassportGooglePLus('profile', profile);
 
       // check if the userId is valid
       const result = Joi.validate({
          id: profile.id
       }, schemas.oAuthSchema);
       if (result.error) {
-         console.log(result.error);
+         debugPassportGooglePLus(`UserId validation failed`, result.error);
          return done(null, false, result.error);
       }
 
@@ -63,10 +71,10 @@ passport.use('googleToken', new GooglePLusTokenStrategy({
          "google.id": profile.id
       });
       if (existingUser) {
-         console.log("User already exists!");
+         debugPassportGooglePLus('User already exists!');
          return done(null, existingUser);
       }
-      console.log("User doesn't exitst --> creating a new one!");
+      debugPassportGooglePLus(`User doesn't exitst --> creating a new one!!`);
 
       // if new user
       const newUser = new User({
@@ -80,7 +88,7 @@ passport.use('googleToken', new GooglePLusTokenStrategy({
       done(null, newUser);
 
    } catch (error) {
-      console.log("error");
+      debugPassportGooglePLus('GooglePlus authentication failed', error);
       done(null, false, error.message);
    }
 }));
@@ -91,15 +99,15 @@ passport.use('facebookToken', new FacebookTokenStrategy({
    clientSecret: config.oauth.facebook.clientSecret
 }, async (accessToken, refreshToken, profile, done) => {
    try {
-      console.log("profile", profile);
-      console.log("accessToken", accessToken);
-      console.log("refreshToken", refreshToken);
+      debugPassportFacebook("profile", profile);
+      debugPassportFacebook("accessToken", accessToken);
+      debugPassportFacebook("refreshToken", refreshToken);
       // check if the userId is valid
       const result = Joi.validate({
          id: profile.id
       }, schemas.oAuthSchema);
       if (result.error) {
-         console.log(result.error);
+         debugPassportFacebook('UserID validation failed', result.error);
          return done(null, false, result.error);
       }
 
@@ -110,6 +118,8 @@ passport.use('facebookToken', new FacebookTokenStrategy({
       if (existingUser) {
          return done(null, existingUser);
       }
+
+      debugPassportFacebook(`User doesn't exitst --> creating a new one!!`);
       const newUser = new User({
          methode: 'facebook',
          facebook: {
@@ -122,6 +132,7 @@ passport.use('facebookToken', new FacebookTokenStrategy({
       done(null, newUser);
 
    } catch (error) {
+      debugPassportFacebook('Facebook authentication failed', error);
       done(error, false, error.message);
    }
 }));
@@ -132,9 +143,9 @@ passport.use('githubToken', new GithubTokenStrategy({
    clientSecret: config.oauth.github.clientSecret
 }, async (accessToken, refreshToken, profile, done) => {
    try {
-      console.log("profile", profile);
-      console.log("accessToken", accessToken);
-      console.log("refreshToken", refreshToken);
+      debugPassportGithub("profile", profile);
+      debugPassportGithub("accessToken", accessToken);
+      debugPassportGithub("refreshToken", refreshToken);
 
       let profileID = profile.id;
       let profileIDString = profileID.toString();
@@ -143,7 +154,7 @@ passport.use('githubToken', new GithubTokenStrategy({
          id: profileIDString
       }, schemas.oAuthSchema);
       if (result.error) {
-         console.log(result.error);
+         debugPassportGithub('UserID validation failed', result.error);
          return done(null, false, result.error);
       }
 
@@ -156,6 +167,8 @@ passport.use('githubToken', new GithubTokenStrategy({
       if (existingUser) {
          return done(null, existingUser);
       }
+
+      debugPassportGithub(`User doesn't exitst --> creating a new one!!`);
       const newUser = new User({
          methode: 'github',
          github: {
@@ -168,6 +181,7 @@ passport.use('githubToken', new GithubTokenStrategy({
       done(null, newUser);
 
    } catch (error) {
+      debugPassportGithub('Github authentication failed', error);
       done(error, false, error.message);
    }
 }));
@@ -195,6 +209,7 @@ passport.use('local', new LocalStrategy({
 
       if (!isMatch) {
          // if don't send the user back
+         debugPassportLocal('wrong password');
          return done(null, false);
       } else {
          // if yes send the user back
@@ -202,6 +217,7 @@ passport.use('local', new LocalStrategy({
       }
 
    } catch (error) {
+      debugPassportLocal('Local authentication failed', error);
       done(error, false); // send back the error and no user object!
    }
 

@@ -2,12 +2,16 @@ const router = require('express-promise-router')();
 const passport = require('passport');
 require('../passport');
 
-
+// validation
 const {
     validateBody,
     schemas
 } = require('../helpers/routeHelpers');
+
+// controller
 const UsersController = require('../controllers/users');
+
+// passport strategies
 const passportSignIn = passport.authenticate('local', {
     session: false
 });
