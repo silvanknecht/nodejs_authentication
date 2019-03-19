@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const Schema = mongoose.Schema;
+const debugUserModel = require('debug')('auth:userModel');
 
 
 
@@ -70,6 +71,7 @@ userSchema.pre('save', async function (next) {
         this.local.password = passowrdHas;
         next();
     } catch (error) {
+        debugUserModel('Save user model in DB failed');
         next(error);
     }
 }); // before user gets saved this is executed, ES6 arrow functions don't work when referencing out of this object
@@ -80,6 +82,7 @@ userSchema.methods.isValidPassword = async function (passwordToCheck) {
         return await bcrypt.compare(passwordToCheck, this.local.password);
 
     } catch (error) {
+        debugUserModel('Password was rejected');
         throw new Error(error);
 
     }
