@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const debugAuthServer = require('debug')('auth:server');
 
 
 // database
@@ -25,5 +26,5 @@ app.use('/api/v1/users', require('./routes/users'));
 // start the server
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
-    console.log(`listening on port ${port}...`);
+    debugAuthServer(`listening on port ${port}...`);
 });

@@ -4,6 +4,9 @@ const {
     JWT_SECRET
 } = require('../conf'); // the index file gets fetched automatically as the first option!
 
+// debug
+const debug = require('debug')('auth:userscontroller');
+
 signToken = user => {
     // create token
     // payload, Secret => encode the token: only here that the server knows that the token has been issued by us and has not been manipulated
@@ -19,7 +22,7 @@ signToken = user => {
 module.exports = {
 
     signUp: async function (req, res, next) {
-        console.log(`UserController.signUp() called`);
+        debug('signUp called');
         const {
             email,
             password
@@ -31,6 +34,7 @@ module.exports = {
         }); //ES6 same as email:email
 
         if (foundUser) {
+            debug('Email already in use');
             return res.status(409).json({
                 error: 'Email is already in use'
             });
@@ -55,16 +59,19 @@ module.exports = {
         res.status(200).json({
             token
         });
+
+        debug('SignUP successful');
     },
 
 
     signIn: async function (req, res, next) {
-        console.log(`Successful signIn!`);
+
         // generate token
         const token = signToken(req.user);
         res.status(200).json({
             token
         });
+        debug(`SignIn successful`);
 
     },
 
@@ -72,37 +79,39 @@ module.exports = {
 
     googleOAuth: async function(req, res, next) {
         // generate token
-        console.log(`Successful googleOAuth!`);
         const token = signToken(req.user);
         res.status(200).json({
             token
         });
+        debug(`GoogleOAuth successful`);
     },
 
     facebookOAuth: async function(req, res, next) {
         // generate token
-        console.log(`Successful facebookOAuth!`);
+
         const token = signToken(req.user);
         res.status(200).json({
             token
         });
+        debug(`FacebookOAuth successful`);
     },
 
 
     githubOAuth: async function(req, res, next) {
         // generate token
-        console.log(`Successful githubOAuth!`);
         const token = signToken(req.user);
         res.status(200).json({
             token
         });
+        debug(`GitHubOAuth successful`);
     },
 
     secret: async function (req, res, next) {
-        console.log('I got the secret');
+
         res.json({
             secret: req.user
         });
+        debug('Access to the secret granted');
     }
 
 };
