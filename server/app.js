@@ -1,26 +1,16 @@
 const express = require("express");
-const morgan = require("morgan");
-const mongoose = require("mongoose");
-const debugAuthServer = require("debug")("auth:server");
-
-// database
-mongoose.connect("mongodb://localhost/APIAuthentication", {
-  useNewUrlParser: true
-});
-mongoose.set("useCreateIndex", true); // Without it Deprication Warning
-
 const app = express();
+const logger = require('./middleware/logger');
 
-// middleware
-app.use(morgan("dev"));
-app.use(express.json());
+process.env.NODE_CONFIG_DIR = './server/config'
+require('./startup/logging')();
+require('./startup/config')();
+require('./startup/routes')(app);
+require('./startup/database')();
 
-// routes
-// users
-app.use("/api/v1/users", require("./routes/users"));
 
-// start the server
+/* Server */
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
-  debugAuthServer(`listening on port ${port}...`);
+  logger.info(`listening on port ${port}...`);
 });
