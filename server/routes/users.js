@@ -1,9 +1,7 @@
 const router = require("express-promise-router")();
 const passport = require("passport");
+const { validateCredentials } = require("../models/user");
 require("../passport");
-
-// validation
-const { validateBody, schemas } = require("../helpers/routeHelpers");
 
 // controller
 const UsersController = require("../controllers/users");
@@ -26,14 +24,10 @@ const passportGithub = passport.authenticate("githubToken", {
 });
 
 // if the validation fails the controller doesn't get called
-router.post(
-  "/signup",
-  validateBody(schemas.authSchemaLocal),
-  UsersController.signUp
-);
+router.post("/signup", validateCredentials, UsersController.signUp);
 router.post(
   "/signin",
-  validateBody(schemas.authSchemaLocal),
+  validateCredentials,
   passportSignIn,
   UsersController.signIn
 );
