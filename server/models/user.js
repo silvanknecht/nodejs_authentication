@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const Joi = require("joi");
 const Schema = mongoose.Schema;
-const debugUserModel = require("debug")("auth:userModel");
 
 // Create a schema
 // TODO: Add other fields: lastname, firstname, birthday, etc.
@@ -53,11 +53,9 @@ const userSchema = new Schema({
 // Before the new use is saved in the database
 userSchema.pre("save", async function(next) {
   //console.log('this.logal.password', this.local.password);
-  try {
     if (this.methode !== "local") {
       next();
     }
-
     // generate a salt
     const salt = await bcrypt.genSalt(10);
     // generate  password has (salt +hash)
@@ -65,24 +63,34 @@ userSchema.pre("save", async function(next) {
     // assign hashed Password
     this.local.password = passowrdHas;
     next();
-  } catch (error) {
-    debugUserModel("Save user model in DB failed");
-    next(error);
-  }
 }); // before user gets saved this is executed, ES6 arrow functions don't work when referencing out of this object
 
 // before logged in we need to check whether or not the password is correct
 userSchema.methods.isValidPassword = async function(passwordToCheck) {
-  try {
     return await bcrypt.compare(passwordToCheck, this.local.password);
-  } catch (error) {
-    debugUserModel("Password was rejected");
-    throw new Error(error);
-  }
 };
 
 // Create a model
-const User = mongoose.model("user", userSchema); // name will be pluralized automatically for DB
+const User = mongoose.model("User", userSchema); // name will be pluralized automatically for DB
+
+
+
+function validateCredentials(req, res, next){
+  const schema  = {
+      email: Joi.string()
+        .email()
+        .required(),
+      password: Joi.string().required()
+    }
+    const result =  Joi.validate(req.body, schema);
+    if (result.error){
+      return res.status(400).send(result.error);
+    }
+    next();
+  }
+
+
 
 // Export the model
 module.exports = User;
+module.exports.validateCredentials = validateCredentials;
