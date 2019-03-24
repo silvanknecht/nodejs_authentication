@@ -6,10 +6,10 @@ const GooglePLusTokenStrategy = require("passport-google-plus-token");
 const FacebookTokenStrategy = require("passport-facebook-token");
 const GithubTokenStrategy = require("passport-github-token");
 const config = require("config");
-const User = require("./models/user");
 const Joi = require("joi");
-const logger = require("./middleware/logger");
 
+const User = require("./models/user");
+const logger = require("./middleware/logger");
 
 // JSON WEB TOKEN STRATEGY
 passport.use(

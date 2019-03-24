@@ -1,7 +1,7 @@
 const JWT = require("jsonwebtoken");
+const config = require("config");
 
 const User = require("../models/user");
-const config = require("config");
 const logger = require('../middleware/logger');
 
 signToken = user => {
@@ -10,7 +10,7 @@ signToken = user => {
   return JWT.sign(
     {
       iss: "NodeJs_Authentification",
-      sub: user.id, // connects the token to the user -> e.g UserID
+      sub: user, // connects the token to the user -> e.g UserID
       iat: new Date().getTime(),
       exp: new Date().setDate(new Date().getDate() + 1) // current date + 1 day
     },

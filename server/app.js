@@ -1,6 +1,8 @@
 const express = require("express");
-const app = express();
+
 const logger = require('./middleware/logger');
+
+const app = express();
 
 process.env.NODE_CONFIG_DIR = './server/config'
 require('./startup/logging')();

@@ -1,7 +1,9 @@
 const router = require("express-promise-router")();
 const passport = require("passport");
-const { validateCredentials } = require("../models/user");
 require("../passport");
+
+const { validateCredentials } = require("../models/user");
+
 
 // controller
 const UsersController = require("../controllers/users");
