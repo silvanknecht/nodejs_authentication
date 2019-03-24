@@ -66,3 +66,6 @@ server/conf/index.js
 #client
 client/node_modules
 
+#tests
+coverage/
+

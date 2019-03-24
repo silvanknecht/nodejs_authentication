@@ -99,5 +99,5 @@ function validateCredentials(req, res, next) {
 }
 
 // Export the model
-module.exports = User;
+module.exports.User = User;
 module.exports.validateCredentials = validateCredentials;
