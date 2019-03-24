@@ -18,7 +18,7 @@ passport.use(
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken("Authorization"),
       secretOrKey: config.get("jwtSecret")
     },
-    async (payload, done) => {
+    async (payload, next) => {
       // find the user specified in token
       logger.debug("payload", payload);
       const user = await User.findById(payload.sub);
@@ -26,10 +26,10 @@ passport.use(
       // if user doesn't exist
       if (!user) {
         logger.info(`User doesn't exit`);
-        return done(null, false);
+        return next(null, false);
       }
       // otherwise, return the user
-      done(null, user);
+      next(null, user);
     }
   )
 );
@@ -42,7 +42,7 @@ passport.use(
       clientID: config.get("oauth.google.clientId"),
       clientSecret: config.get("oauth.google.clientSecret")
     },
-    async (accessToken, refreshToken, profile, done) => {
+    async (accessToken, refreshToken, profile, next) => {
       logger.debug("accessToken", accessToken);
       logger.debug("refreshToken", refreshToken);
       logger.debug("profile", profile);
@@ -51,7 +51,7 @@ passport.use(
       const result = validateOauthId(profile.id);
       if (result.error) {
         logger.error(`UserId validation failed`, result.error);
-        return done(null, false, result.error);
+        return next(null, false, result.error);
       }
 
       // check whether current user exists in DB
@@ -61,7 +61,7 @@ passport.use(
       });
       if (existingUser) {
         logger.info("User already exists!");
-        return done(null, existingUser);
+        return next(null, existingUser);
       }
 
       // if new user
@@ -73,7 +73,7 @@ passport.use(
         }
       });
       await newUser.save();
-      done(null, newUser);
+      next(null, newUser);
     }
   )
 );
@@ -87,7 +87,7 @@ passport.use(
       clientSecret: config.get("oauth.facebook.clientSecret"), //config.get("oauth.facebook.clientSecret")
       fbGraphVersion: "v3.2"
     },
-    async (accessToken, refreshToken, profile, done) => {
+    async (accessToken, refreshToken, profile, next) => {
       logger.debug("profile", profile);
       logger.debug("accessToken", accessToken);
       logger.debug("refreshToken", refreshToken);
@@ -95,7 +95,7 @@ passport.use(
       const result = validateOauthId(profile.id);
       if (result.error) {
         logger.error("UserID validation failed", result.error);
-        return done(null, false, result.error);
+        return next(null, false, result.error);
       }
 
       // check whether current user exits in DB
@@ -104,7 +104,7 @@ passport.use(
       });
       if (existingUser) {
         logger.info("User already exists!");
-        return done(null, existingUser);
+        return next(null, existingUser);
       }
 
       const newUser = new User({
@@ -116,7 +116,7 @@ passport.use(
       });
 
       await newUser.save();
-      done(null, newUser);
+      next(null, newUser);
     }
   )
 );
@@ -129,40 +129,46 @@ passport.use(
       clientID: config.get("oauth.github.clientId"),
       clientSecret: config.get("oauth.github.clientSecret")
     },
-    async (accessToken, refreshToken, profile, done) => {
-      logger.debug("profile", profile);
-      logger.debug("accessToken", accessToken);
-      logger.debug("refreshToken", refreshToken);
+    async (accessToken, refreshToken, profile, next) => {
+      try {
+        logger.debug("profile", profile);
+        logger.debug("accessToken", accessToken);
+        logger.debug("refreshToken", refreshToken);
 
-      let profileID = profile.id;
-      let profileIDString = profileID.toString();
-      // check if the userId is valid
-      const result = validateOauthId(profileIDString);
-      if (result.error) {
-        logger.error("UserID validation failed", result.error);
-        return done(null, false, result.error);
-      }
-
-      // check whether current user exits in DB
-      const existingUser = await User.findOne({
-        "github.id": profileIDString
-      });
-      if (existingUser) {
-        logger.info("User already exists!");
-        return done(null, existingUser);
-      }
-
-      debugPassportGithub(`User doesn't exitst --> creating a new one!!`);
-      const newUser = new User({
-        methode: "github",
-        github: {
-          id: profileIDString,
-          email: profile.emails[0].value
+        let profileID = profile.id;
+        let profileIDString = profileID.toString();
+        // check if the userId is valid
+        const result = validateOauthId(profileIDString);
+        if (result.error) {
+          logger.error("UserID validation failed", result.error);
+          return next(null, false, result.error);
         }
-      });
 
-      await newUser.save();
-      done(null, newUser);
+        // check whether current user exits in DB
+        const existingUser = await User.findOne({
+          "github.id": profileIDString
+        });
+        if (existingUser) {
+          logger.info("User already exists!");
+          console.log(existingUser);
+          return next(null, existingUser);
+        }
+
+        debugPassportGithub(`User doesn't exitst --> creating a new one!!`);
+        const newUser = new User({
+          methode: "github",
+          github: {
+            id: profileIDString,
+            email: profile.emails[0].value
+          }
+        });
+
+        await newUser.save();
+        next(null, newUser);
+      } catch (error) {
+        logger.error(error);
+        next(false);
+      }
     }
   )
 );
@@ -174,7 +180,7 @@ passport.use(
     {
       usernameField: "email"
     },
-    async (email, password, done) => {
+    async (email, password, next) => {
       // find the user given the email
       const user = await User.findOne({
         "local.email": email
@@ -182,7 +188,7 @@ passport.use(
 
       // if not, handle it
       if (!user) {
-        return done(null, false);
+        return next(null, false);
       }
 
       // check if the password is correct
@@ -191,10 +197,10 @@ passport.use(
       if (!isMatch) {
         // if don't send the user back
         logger.info("wrong password");
-        return done(null, false);
+        return next(null, false);
       } else {
         // if yes send the user back
-        done(null, user);
+        next(null, user);
       }
     }
   )
@@ -204,5 +210,5 @@ function validateOauthId(id) {
   const schema = {
     id: Joi.string().required()
   };
-  return Joi.validate({id}, schema);
+  return Joi.validate({ id }, schema);
 }
