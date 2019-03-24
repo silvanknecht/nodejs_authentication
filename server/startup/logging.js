@@ -1,5 +1,5 @@
-//require("express-async-errors");
-/* Logging*/
+require("express-async-errors");
+
 const logger = require("../middleware/logger");
 
 module.exports = function(){
