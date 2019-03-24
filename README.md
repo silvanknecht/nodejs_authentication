@@ -18,50 +18,8 @@ node app.js
 
 ### Prerequisites
 
-Before everything works you need to create the files or env Variables that contain the sensitive data, which allowes to use OAuth. 
-1) Create a new folder and name it conf
-2) Create a file and name it index.js
-3) Copy this template and fill it with your own data
+Before everything works you need to set the enviroment variables definded in the /server/config/customenvironment-variables.json file.
 
-```
-if (process.env.NODE_ENV === 'test') {
-  module.exports = {
-    JWT_SECRET: '',
-    oauth: {
-      google: {
-        clientID: 'number',
-        clientSecret: 'string',
-      },
-      facebook: {
-        clientID: 'number',
-        clientSecret: 'string',
-      },
-      github: {
-        clientID: 'number',
-        clientSecret: 'string',
-      }
-    }
-  };
-} else {
-  module.exports = {
-    JWT_SECRET: '',
-    oauth: {
-      google: {
-        clientID: '',
-        clientSecret: '',
-      },
-      facebook: {
-        clientID: '',
-        clientSecret: '',
-      },
-      github: {
-        clientID: '',
-        clientSecret: '',
-      }
-    }
-  };
-}
-```
 ## Documentation
 
 You can find a postman collection in the respository or online --> [Collection](https://documenter.getpostman.com/view/6959951/S17nUqF1#53f482c6-224d-4a09-b2cf-676736c98ebd)
