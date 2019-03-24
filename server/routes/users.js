@@ -3,12 +3,9 @@ const passport = require("passport");
 require("../passport");
 
 const { validateCredentials } = require("../models/user");
-
-
-// controller
+const validate = require("../middleware/validate");
 const UsersController = require("../controllers/users");
 
-// passport strategies
 const passportSignIn = passport.authenticate("local", {
   session: false
 });
@@ -26,16 +23,20 @@ const passportGithub = passport.authenticate("githubToken", {
 });
 
 // if the validation fails the controller doesn't get called
-router.post("/signup", validateCredentials, UsersController.signUp);
+router.post("/signup", validate(validateCredentials), UsersController.signUp);
 router.post(
   "/signin",
-  validateCredentials,
+  validate(validateCredentials),
   passportSignIn,
   UsersController.signIn
 );
-router.post("/oauth/google", passportGoogle, UsersController.googleOAuth);
-router.post("/oauth/facebook", passportFacebook, UsersController.facebookOAuth);
-router.post("/oauth/github", passportGithub, UsersController.githubOAuth);
+router.post("/oauth/google", passportGoogle, UsersController.thirdPartyOAuth);
+router.post(
+  "/oauth/facebook",
+  passportFacebook,
+  UsersController.thirdPartyOAuth
+);
+router.post("/oauth/github", passportGithub, UsersController.thirdPartyOAuth);
 router.get("/secret", passportJWT, UsersController.secret);
 
 module.exports = router;
