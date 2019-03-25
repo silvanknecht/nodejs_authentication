@@ -1,7 +1,8 @@
 const router = require("express-promise-router")();
 const passport = require("passport");
-require("../passport");
+require("../middleware/passport");
 
+const oAuthErr = require("../middleware/oAuthErr");
 const { validateCredentials } = require("../models/user");
 const validate = require("../middleware/validate");
 const UsersController = require("../controllers/users");
@@ -30,13 +31,23 @@ router.post(
   passportSignIn,
   UsersController.signIn
 );
-router.post("/oauth/google", passportGoogle, UsersController.thirdPartyOAuth);
+router.post(
+  "/oauth/google",
+  passportGoogle,
+  oAuthErr,
+  UsersController.thirdPartyOAuth
+);
 router.post(
   "/oauth/facebook",
   passportFacebook,
   UsersController.thirdPartyOAuth
 );
-router.post("/oauth/github", passportGithub, UsersController.thirdPartyOAuth);
+router.post(
+  "/oauth/github",
+  passportGithub,
+  oAuthErr,
+  UsersController.thirdPartyOAuth
+);
 router.get("/secret", passportJWT, UsersController.secret);
 
 module.exports = router;

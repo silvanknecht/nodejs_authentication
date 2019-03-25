@@ -1,4 +1,4 @@
-const { User } = require("../models/user");
+const User = require("../models/user");
 const logger = require("../middleware/logger");
 
 module.exports = {
@@ -63,7 +63,7 @@ module.exports = {
   },
 
   thirdPartyOAuth: async function(req, res, next) {
-    try {
+      try {
       // generate token
       const user = req.user;
       const token = user.generateAuthToken();

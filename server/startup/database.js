@@ -1,13 +1,16 @@
 const mongoose = require("mongoose");
+const config = require("config");
 
 const logger = require('../middleware/logger');
 
 module.exports = function() {
-  // database
+  const db = config.get("db");
+  var str = db;
+  str = str.replace(/\/\/.*@/, "//***:***@"); // replace credentials with stars
   mongoose
-    .connect("mongodb://localhost/APIAuthentication", {
+    .connect(db, {
       useNewUrlParser: true
     })
-    .then(logger.info("Connected to Database"));
+    .then(logger.info(`Connected to Database at ${str}`));
   mongoose.set("useCreateIndex", true); // Without it Deprication Warning
 };

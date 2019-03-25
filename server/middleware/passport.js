@@ -8,8 +8,8 @@ const GithubTokenStrategy = require("passport-github-token");
 const config = require("config");
 const Joi = require("joi");
 
-const User = require("./models/user");
-const logger = require("./middleware/logger");
+const User = require("../models/user");
+const logger = require("./logger");
 
 // JSON WEB TOKEN STRATEGY
 passport.use(
@@ -141,20 +141,22 @@ passport.use(
         const result = validateOauthId(profileIDString);
         if (result.error) {
           logger.error("UserID validation failed", result.error);
-          return next(null, false, result.error);
+          return next(null , result.error);
         }
 
         // check whether current user exits in DB
         const existingUser = await User.findOne({
           "github.id": profileIDString
         });
+
         if (existingUser) {
+
           logger.info("User already exists!");
-          console.log(existingUser);
-          return next(null, existingUser);
+          logger.debug(existingUser);
+          return next(null,existingUser);
         }
 
-        debugPassportGithub(`User doesn't exitst --> creating a new one!!`);
+        logger.info(`User doesn't exitst --> creating a new one!!`);
         const newUser = new User({
           methode: "github",
           github: {
