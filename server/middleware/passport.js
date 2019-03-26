@@ -141,7 +141,7 @@ passport.use(
         const result = validateOauthId(profileIDString);
         if (result.error) {
           logger.error("UserID validation failed", result.error);
-          return next(null , result.error);
+          return next(null, result.error);
         }
 
         // check whether current user exits in DB
@@ -150,10 +150,9 @@ passport.use(
         });
 
         if (existingUser) {
-
           logger.info("User already exists!");
           logger.debug(existingUser);
-          return next(null,existingUser);
+          return next(null, existingUser);
         }
 
         logger.info(`User doesn't exitst --> creating a new one!!`);
@@ -183,10 +182,12 @@ passport.use(
       usernameField: "email"
     },
     async (email, password, next) => {
+
       // find the user given the email
       const user = await User.findOne({
         "local.email": email
       });
+
 
       // if not, handle it
       if (!user) {
@@ -195,6 +196,7 @@ passport.use(
 
       // check if the password is correct
       const isMatch = await user.isValidPassword(password);
+
 
       if (!isMatch) {
         // if don't send the user back
