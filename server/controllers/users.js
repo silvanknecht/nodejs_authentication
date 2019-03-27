@@ -1,3 +1,5 @@
+const bcrypt = require("bcryptjs");
+
 const User = require("../models/user");
 const logger = require("../middleware/logger");
 
@@ -6,38 +8,53 @@ module.exports = {
     try {
       logger.debug("signUp called");
 
-      const { email, password } = req.body;
+      const { email } = req.body;
+      let { password } = req.body;
 
-      // check if there is a user with the same email
       const foundUser = await User.findOne({
-        "local.email": email
-      }); //ES6 same as email:email
+        email
+      });
 
-      if (foundUser) {
+      if (foundUser && foundUser.methodes.includes("local")) {
         logger.debug("Email already in use");
         return res.status(409).json({
           message: "Email is already in use!"
         });
       }
 
-      // create a new User
-      const newUser = new User({
-        methode: "local",
-        local: {
-          email: email,
-          password: password
-        }
-      }); //ES6 same as email:email, password: password
+      const salt = await bcrypt.genSalt(10);
+      const passowrdHash = await bcrypt.hash(password, salt); //userpassoword, salt => contains hash and hashedPassword, with that hash can the entered password while login be comapred
+      password = passowrdHash;
 
-      await newUser.save();
+      existingUser = await User.findOne({ email });
 
-      // generate token
-      const token = newUser.generateAuthToken();
+      if (existingUser) {
+        logger.debug(
+          "Accoutn with same email already excists --> adding Local to User profile!"
+        );
+        existingUser.methodes.push("local");
+        existingUser.local.password = password;
+        await existingUser.update(existingUser);
 
-      // respond with token
-      res.status(200).json({
-        token
-      });
+        const token = existingUser.generateAuthToken();
+        res.status(200).json({
+          token
+        });
+      } else {
+        const newUser = new User({
+          methodes: ["local"],
+          email,
+          local: {
+            password: password
+          }
+        });
+
+        await newUser.save();
+        const token = newUser.generateAuthToken();
+        res.status(200).json({
+          token
+        });
+      }
 
       logger.debug("SignUP successful");
     } catch (error) {
@@ -49,12 +66,13 @@ module.exports = {
   signIn: async function(req, res, next) {
     try {
       logger.debug("signIn called");
-      // generate token
+
       const user = req.user;
       const token = user.generateAuthToken();
       res.status(200).json({
         token
       });
+
       logger.debug(`SignIn successful`);
     } catch (error) {
       logger.error(error);
@@ -64,7 +82,6 @@ module.exports = {
 
   thirdPartyOAuth: async function(req, res, next) {
     try {
-      // generate token
       const user = req.user;
       const token = user.generateAuthToken();
       res.status(200).json({

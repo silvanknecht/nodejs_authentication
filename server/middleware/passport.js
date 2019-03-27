@@ -56,24 +56,36 @@ passport.use(
 
       // check whether current user exists in DB
       // TODO: maybe only let the user create one account with every E-Mail address!
-      const existingUser = await User.findOne({
-        "google.id": profile.id
-      });
+      let existingUser = await User.findOne({ "google.id": profile.id });
       if (existingUser) {
         logger.info("User already exists!");
         return next(null, existingUser);
       }
 
-      // if new user
-      const newUser = new User({
-        methode: "google",
-        google: {
-          id: profile.id,
-          email: profile.emails[0].value
-        }
-      });
-      await newUser.save();
-      next(null, newUser);
+      const userEmail = profile.emails[0].value;
+
+      existingUser = await User.findOne({ email: userEmail });
+
+      if (existingUser) {
+        logger.debug(
+          "Google User has email of existing User --> adding to Google to User profile!"
+        );
+        existingUser.methodes.push("google");
+        existingUser.google.id = profile.id;
+        await existingUser.update(existingUser);
+        next(null, existingUser);
+      } else {
+        // if new user
+        const newUser = new User({
+          methodes: ["google"],
+          email: userEmail,
+          google: {
+            id: profile.id
+          }
+        });
+        await newUser.save();
+        next(null, newUser);
+      }
     }
   )
 );
@@ -99,7 +111,7 @@ passport.use(
       }
 
       // check whether current user exits in DB
-      const existingUser = await User.findOne({
+      let existingUser = await User.findOne({
         "facebook.id": profile.id
       });
       if (existingUser) {
@@ -107,16 +119,29 @@ passport.use(
         return next(null, existingUser);
       }
 
-      const newUser = new User({
-        methode: "facebook",
-        facebook: {
-          id: profile.id,
-          email: profile.emails[0].value
-        }
-      });
+      const userEmail = profile.emails[0].value;
+      existingUser = await User.findOne({ email: userEmail });
 
-      await newUser.save();
-      next(null, newUser);
+      if (existingUser) {
+        logger.debug(
+          "Facebook User has email of existing User --> adding to Google to User profile!"
+        );
+        existingUser.methodes.push("facebook");
+        existingUser.facebook.id = profile.id;
+        await existingUser.update(existingUser);
+        next(null, existingUser);
+      } else {
+        const newUser = new User({
+          methodes: ["facebook"],
+          email: userEmail,
+          facebook: {
+            id: profile.id
+          }
+        });
+
+        await newUser.save();
+        next(null, newUser);
+      }
     }
   )
 );
@@ -144,8 +169,7 @@ passport.use(
           return next(null, result.error);
         }
 
-        // check whether current user exits in DB
-        const existingUser = await User.findOne({
+        let existingUser = await User.findOne({
           "github.id": profileIDString
         });
 
@@ -155,17 +179,31 @@ passport.use(
           return next(null, existingUser);
         }
 
-        logger.info(`User doesn't exitst --> creating a new one!!`);
-        const newUser = new User({
-          methode: "github",
-          github: {
-            id: profileIDString,
-            email: profile.emails[0].value
-          }
-        });
+        const userEmail = profile.emails[0].value;
 
-        await newUser.save();
-        next(null, newUser);
+        existingUser = await User.findOne({ email: userEmail });
+
+        if (existingUser) {
+          logger.debug(
+            "Github User has email of existing User --> adding to Github to User profile!"
+          );
+          existingUser.methodes.push("github");
+          existingUser.github.id = profile.id;
+          await existingUser.update(existingUser);
+          next(null, existingUser);
+        } else {
+          logger.info(`User doesn't exitst --> creating a new one!!`);
+          const newUser = new User({
+            methodes: ["github"],
+            email: userEmail,
+            github: {
+              id: profileIDString
+            }
+          });
+
+          await newUser.save();
+          next(null, newUser);
+        }
       } catch (error) {
         logger.error(error);
         next(false);
@@ -182,12 +220,10 @@ passport.use(
       usernameField: "email"
     },
     async (email, password, next) => {
-
       // find the user given the email
       const user = await User.findOne({
-        "local.email": email
+        email: email
       });
-
 
       // if not, handle it
       if (!user) {
@@ -196,7 +232,6 @@ passport.use(
 
       // check if the password is correct
       const isMatch = await user.isValidPassword(password);
-
 
       if (!isMatch) {
         // if don't send the user back

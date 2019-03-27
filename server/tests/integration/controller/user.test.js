@@ -1,7 +1,7 @@
 const request = require("supertest");
+const bcrypt = require("bcryptjs");
 
 const User = require("../../../models/user");
-const { thirdPartyOAuth } = require("../../../controllers/users");
 
 let server;
 
@@ -41,18 +41,20 @@ describe("signUp", () => {
   });
   it("should save the user in the database", async () => {
     const res = await exec();
-    const result = await User.findOne({ "local.email": payload.email });
+    const result = await User.findOne({ email: payload.email });
 
     expect(res.status).toBe(200);
-    expect(result.local.email).toBe(payload.email);
+    expect(result.email).toBe(payload.email);
   });
 
   it("should return 409 if the email is already in use", async () => {
+    const salt = await bcrypt.genSalt(10);
+    const passwordHas = await bcrypt.hash(payload.password, salt);
     const mockUser = new User({
-      methode: "local",
+      methode: ["local"],
+      email: "test.test@test.test",
       local: {
-        email: "test.test@test.test",
-        password: "test"
+        password: passwordHas
       }
     });
     await mockUser.save();
@@ -102,15 +104,18 @@ describe("signIn", () => {
   });
 
   it("should return 200 and a valid jwt when valid input was provided", async () => {
+    const salt = await bcrypt.genSalt(10);
+    const passwordHas = await bcrypt.hash(payload.password, salt);
     const mockUser = new User({
-      methode: "local",
+      methode: ["local"],
+      email: "test.test@test.test",
       local: {
-        email: "test.test@test.test",
-        password: "test"
+        password: passwordHas
       }
     });
     await mockUser.save();
-
+    const result = await User.findOne({ email: mockUser.email });
+    console.log("mock", result);
     const res = await exec();
 
     expect(res.status).toBe(200);
@@ -136,11 +141,13 @@ describe("me", () => {
   });
 
   it("should return 200 and the user object if input token is valid", async () => {
+    const salt = await bcrypt.genSalt(10);
+    const passwordHas = await bcrypt.hash("test", salt);
     const mockUser = new User({
-      methode: "local",
+      methode: ["local"],
+      email: "test.test@test.test",
       local: {
-        email: "test.test@test.test",
-        password: "test"
+        password: passwordHas
       }
     });
     await mockUser.save();

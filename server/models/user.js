@@ -1,25 +1,28 @@
-const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const mongoose = require("mongoose");
 const Joi = require("joi");
 const JWT = require("jsonwebtoken");
 const config = require("config");
 
 const Schema = mongoose.Schema;
 
+const logger = require("../middleware/logger");
+
 // Create a schema
 // TODO: Add other fields: lastname, firstname, birthday, etc.
 const userSchema = new Schema({
   // Additional validation, it's also done serverside!
-  methode: {
-    type: String,
+  methodes: {
+    type: [String],
     enum: ["local", "google", "facebook", "github"],
     required: true
   },
+  email: {
+    type: String,
+    lowercase: true,
+    required: true
+  },
   local: {
-    email: {
-      type: String,
-      lowercase: true
-    },
     password: {
       type: String
     }
@@ -27,44 +30,19 @@ const userSchema = new Schema({
   google: {
     id: {
       type: String
-    },
-    email: {
-      type: String,
-      lowercase: true
     }
   },
   facebook: {
     id: {
       type: String
-    },
-    email: {
-      type: String,
-      lowercase: true
     }
   },
   github: {
     id: {
       type: String
-    },
-    email: {
-      type: String,
-      lowercase: true
     }
   }
 });
-
-userSchema.pre("save", async function(next) {
-  if (this.methode !== "local") {
-    next();
-  }
-
-  const salt = await bcrypt.genSalt(10);
-  // generate  password has (salt +hash)
-  const passowrdHas = await bcrypt.hash(this.local.password, salt); //userpassoword, salt => contains hash and hashedPassword, with that hash can the entered password while login be comapred
-  // assign hashed Password
-  this.local.password = passowrdHas;
-  next();
-}); // before user gets saved this is executed, ES6 arrow functions don't work when referencing out of this object
 
 userSchema.methods.isValidPassword = async function(passwordToCheck) {
   return await bcrypt.compare(passwordToCheck, this.local.password);
