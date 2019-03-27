@@ -53,13 +53,11 @@ const userSchema = new Schema({
   }
 });
 
-// Before the new use is saved in the database
 userSchema.pre("save", async function(next) {
-  //console.log('this.logal.password', this.local.password);
   if (this.methode !== "local") {
     next();
   }
-  // generate a salt
+
   const salt = await bcrypt.genSalt(10);
   // generate  password has (salt +hash)
   const passowrdHas = await bcrypt.hash(this.local.password, salt); //userpassoword, salt => contains hash and hashedPassword, with that hash can the entered password while login be comapred
@@ -68,7 +66,6 @@ userSchema.pre("save", async function(next) {
   next();
 }); // before user gets saved this is executed, ES6 arrow functions don't work when referencing out of this object
 
-// before logged in we need to check whether or not the password is correct
 userSchema.methods.isValidPassword = async function(passwordToCheck) {
   return await bcrypt.compare(passwordToCheck, this.local.password);
 };
@@ -77,7 +74,7 @@ userSchema.methods.generateAuthToken = function() {
   const token = JWT.sign(
     {
       iss: "NodeJs_Authentification",
-      sub: this, // connects the token to the user -> e.g UserID
+      sub: this,
       iat: new Date().getTime(),
       exp: new Date().setDate(new Date().getDate() + 1) // current date + 1 day
     },

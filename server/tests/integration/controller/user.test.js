@@ -1,5 +1,8 @@
 const request = require("supertest");
+
 const User = require("../../../models/user");
+const { thirdPartyOAuth } = require("../../../controllers/users");
+
 let server;
 
 beforeEach(() => {
@@ -17,14 +20,6 @@ describe("signUp", () => {
       .post("/api/v1/users/signUp")
       .send(payload);
   };
-
-  const mockUser = new User({
-    methode: "local",
-    local: {
-      email: "test.test@test.test",
-      password: "test"
-    }
-  });
 
   beforeEach(() => {
     payload = { email: "test.test@test.test", password: "test" };
@@ -53,6 +48,13 @@ describe("signUp", () => {
   });
 
   it("should return 409 if the email is already in use", async () => {
+    const mockUser = new User({
+      methode: "local",
+      local: {
+        email: "test.test@test.test",
+        password: "test"
+      }
+    });
     await mockUser.save();
 
     const res = await exec();
@@ -79,14 +81,6 @@ describe("signIn", () => {
       .send(payload);
   };
 
-  const mockUser = new User({
-    methode: "local",
-    local: {
-      email: "test.test@test.test",
-      password: "test"
-    }
-  });
-
   beforeEach(async () => {
     payload = { email: "test.test@test.test", password: "test" };
   });
@@ -108,6 +102,13 @@ describe("signIn", () => {
   });
 
   it("should return 200 and a valid jwt when valid input was provided", async () => {
+    const mockUser = new User({
+      methode: "local",
+      local: {
+        email: "test.test@test.test",
+        password: "test"
+      }
+    });
     await mockUser.save();
 
     const res = await exec();
@@ -119,6 +120,34 @@ describe("signIn", () => {
   });
 });
 
+describe("me", () => {
+  let token;
+  const exec = () => {
+    return request(server)
+      .get("/api/v1/users/me")
+      .set("Authorization", token);
+  };
+  it("should return 401 if input token is invalid", async () => {
+    token = "0";
 
+    const res = await exec();
 
+    expect(res.status).toBe(401);
+  });
 
+  it("should return 200 and the user object if input token is valid", async () => {
+    const mockUser = new User({
+      methode: "local",
+      local: {
+        email: "test.test@test.test",
+        password: "test"
+      }
+    });
+    await mockUser.save();
+    token = "bearer " + mockUser.generateAuthToken();
+
+    const res = await exec();
+
+    expect(res.body).toHaveProperty("_id");
+  });
+});

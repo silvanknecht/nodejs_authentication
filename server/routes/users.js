@@ -48,6 +48,6 @@ router.post(
   oAuthErr,
   UsersController.thirdPartyOAuth
 );
-router.get("/secret", passportJWT, UsersController.secret);
+router.get("/me", passportJWT, UsersController.me);
 
 module.exports = router;

@@ -63,7 +63,7 @@ module.exports = {
   },
 
   thirdPartyOAuth: async function(req, res, next) {
-      try {
+    try {
       // generate token
       const user = req.user;
       const token = user.generateAuthToken();
@@ -77,12 +77,10 @@ module.exports = {
     }
   },
 
-  secret: async function(req, res, next) {
+  me: async function(req, res, next) {
     try {
-      res.json({
-        secret: req.user
-      });
-      logger.debug("Access to the secret granted");
+      res.json(req.user);
+      logger.debug("Access to me granted!");
     } catch (error) {
       logger.error(error);
       next(false);
