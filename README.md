@@ -3,7 +3,7 @@ This is a template for NodeJs applications, it contains local login and google, 
 
 ## Getting Started
 
-make sure you have a MongoDB running on port 27017
+make sure you have a MongoDB running on port 27017 and make sure to follow the instructions in Prerequisites.
 
 Inside of the server folder:
 Install all the necessary node packages
@@ -19,6 +19,13 @@ node app.js
 ### Prerequisites
 
 Before everything works you need to set the enviroment variables definded in the /server/config/customenvironment-variables.json file.
+
+## Tests
+to run the thests use 
+```
+npm test
+```
+The tests do not include the thirdPartyOAuth yet. I'm looking on possibilites to realize this!
 
 ## Documentation
 
