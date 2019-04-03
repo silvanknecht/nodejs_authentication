@@ -25,7 +25,7 @@ to run the thests use
 ```
 npm test
 ```
-The tests do not include the thirdPartyOAuth yet. I'm looking on possibilites to realize this!
+The tests do not include the thirdPartyOAuth yet. I'm looking on possibilites to implement them!
 
 ## Documentation
 
